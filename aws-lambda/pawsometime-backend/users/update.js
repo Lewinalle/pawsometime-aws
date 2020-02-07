@@ -1,18 +1,54 @@
 'use strict';
 
+const AWS = require('aws-sdk');
+
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
 module.exports.update = async (event) => {
-	return {
-		statusCode: 200,
-		body: JSON.stringify(
-			{
-				message: 'PUT update a post called!',
-				input: event
-			},
-			null,
-			2
-		)
+	// TODO: Upload image and save url to image field (data.avatar)
+
+	const timestamp = new Date().getTime();
+	const data = JSON.parse(event.body);
+
+	// validation
+	if (typeof data.description !== 'string') {
+		console.error('Validation Failed!');
+		return {
+			statusCode: 400,
+			body: JSON.stringify({
+				developerMessage: 'Validation Failed!',
+				userMessage: 'One of the fields is not valid.'
+			})
+		};
+	}
+
+	const params = {
+		TableName: process.env.USERS_TABLE,
+		Key: {
+			id: event.pathParameters.id
+		},
+		ExpressionAttributeValues: {
+			':description': data.description,
+			':updatedAt': timestamp
+		},
+		UpdateExpression: 'SET description = :description, updatedAt = :updatedAt',
+		ReturnValues: 'ALL_NEW'
 	};
 
-	// Use this code if you don't use the http event with the LAMBDA-PROXY integration
-	// return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+	try {
+		const res = await dynamoDb.update(params).promise();
+		console.log(res);
+
+		return {
+			statusCode: 200,
+			body: JSON.stringify(res.Attributes)
+		};
+	} catch (err) {
+		console.log(err);
+
+		return {
+			statusCode: 422,
+			body: JSON.stringify(err)
+		};
+	}
 };

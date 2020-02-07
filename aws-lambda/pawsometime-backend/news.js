@@ -6,7 +6,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.get = async (event) => {
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: process.env.NEWS_TABLE,
 		Key: {
 			id: event.pathParameters.id
 		}
@@ -18,7 +18,7 @@ module.exports.get = async (event) => {
 
 		return {
 			statusCode: 200,
-			body: JSON.stringify(res.Item)
+			body: JSON.stringify(res)
 		};
 	} catch (err) {
 		console.log(err);

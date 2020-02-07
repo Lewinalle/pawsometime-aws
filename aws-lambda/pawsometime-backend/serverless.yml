@@ -29,6 +29,7 @@ provider:
     POSTS_TABLE: ${self:service}-posts
     MEETUPS_TABLE: ${self:service}-meetups
     USERS_TABLE: ${self:service}-users
+    NEWS_TABLE: ${self:service}-news
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -42,6 +43,7 @@ provider:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
 
 
 # you can overwrite defaults here
@@ -117,6 +119,30 @@ functions:
       - http:
           path: posts/{id}
           method: delete
+          cors: true
+
+  commentPosts:
+    handler: posts/comment.comment
+    events:
+      - http:
+          path: posts/{id}/comment
+          method: post
+          cors: true
+
+  deleteCommentPosts:
+    handler: posts/comment.delete
+    events:
+      - http:
+          path: posts/{id}/comment/{commentId}
+          method: delete
+          cors: true
+
+  likePosts:
+    handler: posts/like.like
+    events:
+      - http:
+          path: posts/{id}/like
+          method: post
           cors: true
 
   # meetups endpoints
@@ -200,6 +226,39 @@ functions:
           path: users/{id}
           method: delete
           cors: true
+
+  friendsRequest:
+    handler: users/friends.request
+    events:
+      - http:
+          path: users/friends/request
+          method: post
+          cors: true
+      
+  friendsAccept:
+    handler: users/friends.accept
+    events:
+      - http:
+          path: users/friends/accept
+          method: post
+          cors: true
+
+  friendsReject:
+    handler: users/friends.reject
+    events:
+      - http:
+          path: users/friends/reject
+          method: post
+          cors: true
+
+  # news endpoints
+  getNews:
+    handler: news.get
+    events:
+      - http:
+          path: news
+          method: get
+          cors: true
   
   # test handler for fast-responst
   testCall:
@@ -264,6 +323,23 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.USERS_TABLE}
+    # news table
+    NewsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NEWS_TABLE}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

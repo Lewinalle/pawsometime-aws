@@ -13,11 +13,13 @@ module.exports.delete = async (event) => {
 	};
 
 	try {
+		// TODO: get item and delete file in s3 if there is any
+
 		const res = await dynamoDb.delete(params).promise();
 		console.log(res);
 
 		return {
-			statusCode: 202,
+			statusCode: 200,
 			body: JSON.stringify(res)
 		};
 	} catch (err) {

@@ -24,7 +24,7 @@ module.exports.create = async (event) => {
 		console.log(res);
 
 		return {
-			statusCode: 201,
+			statusCode: 200,
 			body: JSON.stringify(params.Item)
 		};
 	} catch (err) {

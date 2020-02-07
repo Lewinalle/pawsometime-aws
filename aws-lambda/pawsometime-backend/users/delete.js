@@ -6,7 +6,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.delete = async (event) => {
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: process.env.USERS_TABLE,
 		Key: {
 			id: event.pathParameters.id
 		}
@@ -17,7 +17,7 @@ module.exports.delete = async (event) => {
 		console.log(res);
 
 		return {
-			statusCode: 202,
+			statusCode: 200,
 			body: JSON.stringify(res)
 		};
 	} catch (err) {
