@@ -25,6 +25,7 @@ provider:
   runtime: nodejs12.x
   profile: serverless-admin
   region: us-west-2
+  memorySize: 768
   environment:
     POSTS_TABLE: ${self:service}-posts
     MEETUPS_TABLE: ${self:service}-meetups
@@ -121,30 +122,6 @@ functions:
           method: delete
           cors: true
 
-  commentPosts:
-    handler: posts/comment.comment
-    events:
-      - http:
-          path: posts/{id}/comment
-          method: post
-          cors: true
-
-  deleteCommentPosts:
-    handler: posts/comment.delete
-    events:
-      - http:
-          path: posts/{id}/comment/{commentId}
-          method: delete
-          cors: true
-
-  likePosts:
-    handler: posts/like.like
-    events:
-      - http:
-          path: posts/{id}/like
-          method: post
-          cors: true
-
   # meetups endpoints
   createMeeups:
     handler: meetups/create.create
@@ -185,7 +162,31 @@ functions:
           path: meetups/{id}
           method: delete
           cors: true
+
+  requestJoinMeeups:
+    handler: meetups/join.request
+    events:
+      - http:
+          path: meetups/{id}/request
+          method: post
+          cors: true
+
+  acceptJoinMeeups:
+    handler: meetups/join.accept
+    events:
+      - http:
+          path: meetups/{id}/accept
+          method: post
+          cors: true
   
+  rejectJoinMeeups:
+    handler: meetups/join.reject
+    events:
+      - http:
+          path: meetups/{id}/reject
+          method: post
+          cors: true
+    
   # users endpoints
   createUsers:
     handler: users/create.create
@@ -248,6 +249,32 @@ functions:
     events:
       - http:
           path: users/friends/reject
+          method: post
+          cors: true
+
+  # comments endpoints
+  commentResource:
+    handler: comments/create.create
+    events:
+      - http:
+          path: resource/{id}/comment
+          method: post
+          cors: true
+
+  deleteCommentResource:
+    handler: comments/delete.delete
+    events:
+      - http:
+          path: resource/{id}/comment/{commentId}
+          method: post
+          cors: true
+
+  # likes endpoints
+  likeResource:
+    handler: likes/like.like
+    events:
+      - http:
+          path: resource/{id}/like
           method: post
           cors: true
 

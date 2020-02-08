@@ -10,8 +10,10 @@ module.exports.like = async (event) => {
 	let likes = [];
 	let newLikes = [];
 
+	let tableName;
+
 	// validation
-	if (typeof data.userId !== 'string') {
+	if (typeof data.resource !== 'string' || typeof data.userId !== 'string') {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -22,8 +24,22 @@ module.exports.like = async (event) => {
 		};
 	}
 
+	if (data.resource.toLowerCase() === 'meetups') {
+		tableName = process.env.MEETUPS_TABLE;
+	} else if (data.resource.toLowerCase() === 'posts') {
+		tableName = process.env.POSTS_TABLE;
+	} else {
+		return {
+			statusCode: 422,
+			body: JSON.stringify({
+				developerMessage: 'Could not find resource in createComments',
+				userMessage: 'Resource is not found.'
+			})
+		};
+	}
+
 	const searchParams = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: tableName,
 		Key: {
 			id: event.pathParameters.id
 		}
@@ -62,7 +78,7 @@ module.exports.like = async (event) => {
 	}
 
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: tableName,
 		Key: {
 			id: event.pathParameters.id
 		},

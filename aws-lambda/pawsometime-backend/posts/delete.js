@@ -5,6 +5,8 @@ const AWS = require('aws-sdk');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.delete = async (event) => {
+	// TODO: (after cognito integration) CHECK USERID TO VERIFY PERMISSION (if different, block)
+
 	const params = {
 		TableName: process.env.POSTS_TABLE,
 		Key: {

@@ -1,18 +1,31 @@
 'use strict';
 
+const AWS = require('aws-sdk');
+
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
 module.exports.get = async (event) => {
-	return {
-		statusCode: 200,
-		body: JSON.stringify(
-			{
-				message: 'GET get a post called!',
-				input: event
-			},
-			null,
-			2
-		)
+	const params = {
+		TableName: process.env.MEETUPS_TABLE,
+		Key: {
+			id: event.pathParameters.id
+		}
 	};
 
-	// Use this code if you don't use the http event with the LAMBDA-PROXY integration
-	// return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+	try {
+		const res = await dynamoDb.get(params).promise();
+		console.log(res);
+
+		return {
+			statusCode: 200,
+			body: JSON.stringify(res.Item)
+		};
+	} catch (err) {
+		console.log(err);
+
+		return {
+			statusCode: 422,
+			body: JSON.stringify(err)
+		};
+	}
 };

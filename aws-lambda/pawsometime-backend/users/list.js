@@ -37,6 +37,17 @@ module.exports.list = async (event) => {
 		filterExp += 'contains (description, :description)';
 	}
 
+	// search email
+	if (event.queryStringParameters && event.queryStringParameters.email) {
+		email = event.queryStringParameters.email;
+
+		attrValues[':email'] = email;
+		if (filterExp !== '') {
+			filterExp += ' AND ';
+		}
+		filterExp += 'email = :email';
+	}
+
 	// search userIds
 	if (event.queryStringParameters && event.queryStringParameters.userIds) {
 		try {
