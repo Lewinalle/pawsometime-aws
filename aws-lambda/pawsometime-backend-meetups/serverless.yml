@@ -1,0 +1,120 @@
+
+service: pawsometime-backend-meetups
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: serverless-admin
+  region: us-west-2
+  memorySize: 512
+  environment:
+    POSTS_TABLE: pawsometime-backend-posts-posts
+    MEETUPS_TABLE: pawsometime-backend-meetups-meetups
+    USERS_TABLE: pawsometime-backend-users-users
+    NEWS_TABLE: pawsometime-backend-others-news
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
+    - Effect: Allow
+      Action:
+        - "s3:*"
+      Resource: 
+        - "*"
+
+functions:
+  # meetups endpoints
+  createMeeups:
+    handler: meetups/create.create
+    events:
+      - http:
+          path: meetups
+          method: post
+          cors: true
+
+  listMeeups:
+    handler: meetups/list.list
+    events:
+      - http:
+          path: meetups
+          method: get
+          cors: true
+
+  getMeeups:
+    handler: meetups/get.get
+    events:
+      - http:
+          path: meetups/{id}
+          method: get
+          cors: true
+
+  updateMeeups:
+    handler: meetups/update.update
+    events:
+      - http:
+          path: meetups/{id}
+          method: put
+          cors: true
+  
+  deleteMeeups:
+    handler: meetups/delete.delete
+    events:
+      - http:
+          path: meetups/{id}
+          method: delete
+          cors: true
+
+  requestJoinMeeups:
+    handler: meetups/join.request
+    events:
+      - http:
+          path: meetups/{id}/request
+          method: post
+          cors: true
+
+  acceptJoinMeeups:
+    handler: meetups/join.accept
+    events:
+      - http:
+          path: meetups/{id}/accept
+          method: post
+          cors: true
+  
+  rejectJoinMeeups:
+    handler: meetups/join.reject
+    events:
+      - http:
+          path: meetups/{id}/reject
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    # meetups table
+    MeetupsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.MEETUPS_TABLE}
+    

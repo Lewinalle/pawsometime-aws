@@ -1,0 +1,111 @@
+
+service: pawsometime-backend-others
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: serverless-admin
+  region: us-west-2
+  memorySize: 512
+  environment:
+    POSTS_TABLE: pawsometime-backend-posts-posts
+    MEETUPS_TABLE: pawsometime-backend-meetups-meetups
+    USERS_TABLE: pawsometime-backend-users-users
+    NEWS_TABLE: pawsometime-backend-others-news
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
+    - Effect: Allow
+      Action:
+        - "s3:*"
+      Resource: 
+        - "*"
+
+functions:
+  # comments endpoints
+  commentResource:
+    handler: comments/create.create
+    events:
+      - http:
+          path: resource/{id}/comment
+          method: post
+          cors: true
+
+  deleteCommentResource:
+    handler: comments/delete.delete
+    events:
+      - http:
+          path: resource/{id}/comment/{commentId}
+          method: post
+          cors: true
+
+  # likes endpoints
+  likeResource:
+    handler: likes/like.like
+    events:
+      - http:
+          path: resource/{id}/like
+          method: post
+          cors: true
+  
+  # s3 endpoints
+  s3UploadUrl:
+    handler: s3/getSignedUrl.getSignedUploadUrl
+    events:
+      - http:
+          path: s3/uploadurl
+          method: post
+          cors: true      
+
+  # news endpoints
+  getNews:
+    handler: news.get
+    events:
+      - http:
+          path: news
+          method: get
+          cors: true
+  
+  # pre-signup trigger
+  preSignupTrigger:
+    handler: users/preSignupTrigger.preSignupTrigger
+  
+  # test handler for fast-responst
+  testGet:
+    handler: handler.get
+    events:
+      - http:
+          path: test/get
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    # news table
+    NewsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NEWS_TABLE}

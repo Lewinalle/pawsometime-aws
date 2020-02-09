@@ -3,12 +3,7 @@
 	"description": "Pawsometime backend running on aws-lambda",
 	"version": "1.0.0",
 	"author": "Lewis Kim",
-	"licenses": [
-		{
-			"type": "MIT",
-			"url": "http://opensource.org/licenses/MIT"
-		}
-	],
+	"licenses": [],
 	"dependencies": {
 		"aws-sdk": "^2.612.0",
 		"uuid": "^3.4.0",

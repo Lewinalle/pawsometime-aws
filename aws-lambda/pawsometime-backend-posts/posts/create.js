@@ -6,13 +6,18 @@ const AWS = require('aws-sdk');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.create = async (event) => {
-	// TODO: Upload image and save url to image field (data.avatar)
+	// TODO: Upload image and save url to image field (data.attachment)
 
 	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
 
 	// validation
-	if (typeof data.username !== 'string') {
+	if (
+		typeof data.title !== 'string' ||
+		typeof data.description !== 'string' ||
+		typeof data.userId !== 'string' ||
+		typeof data.userName !== 'string'
+	) {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -23,47 +28,23 @@ module.exports.create = async (event) => {
 		};
 	}
 
-	const searchParams = {
-		TableName: process.env.USERS_TABLE,
-		ExpressionAttributeValues: {
-			':username': data.username
-		},
-		FilterExpression: 'username = :username'
-	};
-
 	const params = {
-		TableName: process.env.USERS_TABLE,
+		TableName: process.env.POSTS_TABLE,
 		Item: {
 			id: uuid.v4(),
-			email: data.email,
-			username: data.username,
+			title: data.title,
 			description: data.description,
-			avatar: data.avatar ? data.avatar : null,
-			friends: {
-				pending: [],
-				sent: [],
-				friends: []
-			},
-			confirmed: false,
+			userId: data.userId,
+			userName: data.userName,
+			likes: [], // array of userId
+			comments: [], // array of comment object (id, description, userId, userName, userAvatar, createdAt)
+			attachment: data.attachment ? data.attachment : null,
 			createdAt: timestamp,
 			updatedAt: timestamp
 		}
 	};
 
 	try {
-		const searchRes = await dynamoDb.scan(searchParams).promise();
-		console.log(searchRes);
-		if (searchRes.Count !== 0) {
-			console.error('Username already exists!');
-			return {
-				statusCode: 400,
-				body: JSON.stringify({
-					developerMessage: 'Username is already exists.',
-					userMessage: 'Username is already exists.'
-				})
-			};
-		}
-
 		const res = await dynamoDb.put(params).promise();
 		console.log(res);
 

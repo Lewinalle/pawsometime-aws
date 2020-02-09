@@ -44,7 +44,7 @@ module.exports.create = async (event) => {
 			joined: [],
 			likes: [], // array of userIds
 			comments: [], // array of comment object (id, description, userId, userName, userAvatar, createdAt)
-			file: data.attachment ? data.attachment : null,
+			attachment: data.attachment ? data.attachment : null,
 			createdAt: timestamp,
 			updatedAt: timestamp
 		}

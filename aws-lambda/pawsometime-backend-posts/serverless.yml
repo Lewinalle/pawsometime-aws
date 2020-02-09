@@ -1,0 +1,96 @@
+
+service: pawsometime-backend-posts
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: serverless-admin
+  region: us-west-2
+  memorySize: 512
+  environment:
+    POSTS_TABLE: pawsometime-backend-posts-posts
+    MEETUPS_TABLE: pawsometime-backend-meetups-meetups
+    USERS_TABLE: pawsometime-backend-users-users
+    NEWS_TABLE: pawsometime-backend-others-news
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
+    - Effect: Allow
+      Action:
+        - "s3:*"
+      Resource: 
+        - "*"
+
+functions:
+  # posts endpoints
+  createPosts:
+    handler: posts/create.create
+    events:
+      - http:
+          path: posts
+          method: post
+          cors: true
+
+  listPosts:
+    handler: posts/list.list
+    events:
+      - http:
+          path: posts
+          method: get
+          cors: true
+
+  getPosts:
+    handler: posts/get.get
+    events:
+      - http:
+          path: posts/{id}
+          method: get
+          cors: true
+
+  updatePosts:
+    handler: posts/update.update
+    events:
+      - http:
+          path: posts/{id}
+          method: put
+          cors: true
+  
+  deletePosts:
+    handler: posts/delete.delete
+    events:
+      - http:
+          path: posts/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    # posts table
+    PostsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.POSTS_TABLE}
+    

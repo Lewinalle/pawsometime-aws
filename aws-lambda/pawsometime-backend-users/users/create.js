@@ -6,18 +6,13 @@ const AWS = require('aws-sdk');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.create = async (event) => {
-	// TODO: Upload image and save url to image field (data.attachment)
+	// TODO: Upload image and save url to image field (data.avatar)
 
 	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
 
 	// validation
-	if (
-		typeof data.title !== 'string' ||
-		typeof data.description !== 'string' ||
-		typeof data.userId !== 'string' ||
-		typeof data.userName !== 'string'
-	) {
+	if (typeof data.username !== 'string') {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -28,23 +23,46 @@ module.exports.create = async (event) => {
 		};
 	}
 
+	const searchParams = {
+		TableName: process.env.USERS_TABLE,
+		ExpressionAttributeValues: {
+			':username': data.username
+		},
+		FilterExpression: 'username = :username'
+	};
+
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: process.env.USERS_TABLE,
 		Item: {
 			id: uuid.v4(),
-			title: data.title,
+			email: data.email,
+			username: data.username,
 			description: data.description,
-			userId: data.userId,
-			userName: data.userName,
-			likes: [], // array of userId
-			comments: [], // array of comment object (id, description, userId, userName, userAvatar, createdAt)
-			file: data.attachment ? data.attachment : null,
+			avatar: data.avatar ? data.avatar : null,
+			friends: {
+				pending: [],
+				sent: [],
+				friends: []
+			},
+			confirmed: false,
 			createdAt: timestamp,
 			updatedAt: timestamp
 		}
 	};
 
 	try {
+		const searchRes = await dynamoDb.scan(searchParams).promise();
+		if (searchRes.Count !== 0) {
+			console.error('Username already exists!');
+			return {
+				statusCode: 400,
+				body: JSON.stringify({
+					developerMessage: 'Username is already exists.',
+					userMessage: 'Username is already exists.'
+				})
+			};
+		}
+
 		const res = await dynamoDb.put(params).promise();
 		console.log(res);
 

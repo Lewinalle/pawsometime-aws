@@ -1,0 +1,119 @@
+
+service: pawsometime-backend-users
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: serverless-admin
+  region: us-west-2
+  memorySize: 512
+  environment:
+    POSTS_TABLE: pawsometime-backend-posts-posts
+    MEETUPS_TABLE: pawsometime-backend-meetups-meetups
+    USERS_TABLE: pawsometime-backend-users-users
+    NEWS_TABLE: pawsometime-backend-others-news
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
+    - Effect: Allow
+      Action:
+        - "s3:*"
+      Resource: 
+        - "*"
+
+functions:
+  # users endpoints
+  # createUsers:
+  #   handler: users/create.create
+  #   events:
+  #     - http:
+  #         path: users
+  #         method: post
+  #         cors: true
+
+  listUsers:
+    handler: users/list.list
+    events:
+      - http:
+          path: users
+          method: get
+          cors: true
+
+  getUsers:
+    handler: users/get.get
+    events:
+      - http:
+          path: users/{id}
+          method: get
+          cors: true
+
+  updateUsers:
+    handler: users/update.update
+    events:
+      - http:
+          path: users/{id}
+          method: put
+          cors: true
+  
+  deleteUsers:
+    handler: users/delete.delete
+    events:
+      - http:
+          path: users/{id}
+          method: delete
+          cors: true
+
+  friendsRequest:
+    handler: users/friends.request
+    events:
+      - http:
+          path: users/friends/request
+          method: post
+          cors: true
+      
+  friendsAccept:
+    handler: users/friends.accept
+    events:
+      - http:
+          path: users/friends/accept
+          method: post
+          cors: true
+
+  friendsReject:
+    handler: users/friends.reject
+    events:
+      - http:
+          path: users/friends/reject
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    # users table
+    UsersDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.USERS_TABLE}
