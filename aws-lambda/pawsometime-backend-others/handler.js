@@ -4,6 +4,8 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
 
 module.exports.get = async (event) => {
+	console.log('TEST RUNNING !');
+
 	return {
 		statusCode: 200,
 		body: JSON.stringify(

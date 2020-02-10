@@ -103,8 +103,6 @@ module.exports.request = async (event) => {
 };
 
 module.exports.accept = async (event) => {
-	// TODO: (after cognito integration) CHECK USERID TO VERIFY PERMISSION (if different, block)
-
 	const data = JSON.parse(event.body);
 
 	let pending = [];
@@ -201,8 +199,6 @@ module.exports.accept = async (event) => {
 };
 
 module.exports.reject = async (event) => {
-	// TODO: (after cognito integration) CHECK USERID TO VERIFY PERMISSION (if different, block)
-
 	const data = JSON.parse(event.body);
 
 	let pending = [];

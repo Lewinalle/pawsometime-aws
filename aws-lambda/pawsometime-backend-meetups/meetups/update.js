@@ -5,9 +5,6 @@ const AWS = require('aws-sdk');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.update = async (event) => {
-	// TODO: (after cognito integration) CHECK USERID TO VERIFY PERMISSION (if different, block)
-	// TODO: Upload image and save url to image field (data.attachment)
-
 	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
 

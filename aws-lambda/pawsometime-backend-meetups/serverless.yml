@@ -41,6 +41,9 @@ functions:
           path: meetups
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   listMeeups:
     handler: meetups/list.list
@@ -65,6 +68,9 @@ functions:
           path: meetups/{id}
           method: put
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
   deleteMeeups:
     handler: meetups/delete.delete
@@ -73,6 +79,9 @@ functions:
           path: meetups/{id}
           method: delete
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   requestJoinMeeups:
     handler: meetups/join.request
@@ -81,6 +90,9 @@ functions:
           path: meetups/{id}/request
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   acceptJoinMeeups:
     handler: meetups/join.accept
@@ -89,6 +101,9 @@ functions:
           path: meetups/{id}/accept
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
   rejectJoinMeeups:
     handler: meetups/join.reject
@@ -97,6 +112,9 @@ functions:
           path: meetups/{id}/reject
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
 resources:
   Resources:

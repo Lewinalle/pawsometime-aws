@@ -8,8 +8,6 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const MAX_OFFSET = 0.1;
 
 module.exports.list = async (event) => {
-	// TODO: add sorting features with more fields later on
-
 	let title = '';
 	let description = '';
 	let userName = '';

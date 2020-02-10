@@ -41,6 +41,9 @@ functions:
           path: posts
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   listPosts:
     handler: posts/list.list
@@ -65,6 +68,9 @@ functions:
           path: posts/{id}
           method: put
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
   deletePosts:
     handler: posts/delete.delete
@@ -73,6 +79,9 @@ functions:
           path: posts/{id}
           method: delete
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
 resources:
   Resources:

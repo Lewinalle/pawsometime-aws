@@ -12,6 +12,7 @@ provider:
     MEETUPS_TABLE: pawsometime-backend-meetups-meetups
     USERS_TABLE: pawsometime-backend-users-users
     NEWS_TABLE: pawsometime-backend-others-news
+    S3_BUCKET: pawsometime-serverless-s3
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -41,6 +42,9 @@ functions:
           path: resource/{id}/comment
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   deleteCommentResource:
     handler: comments/delete.delete
@@ -49,6 +53,9 @@ functions:
           path: resource/{id}/comment/{commentId}
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   # likes endpoints
   likeResource:
@@ -58,6 +65,9 @@ functions:
           path: resource/{id}/like
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
   # s3 endpoints
   s3UploadUrl:
@@ -67,15 +77,25 @@ functions:
           path: s3/uploadurl
           method: post
           cors: true      
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   # news endpoints
   getNews:
-    handler: news.get
+    handler: news/news.get
     events:
       - http:
           path: news
           method: get
           cors: true
+
+  cronNews:
+    handler: news/cronNews.cronNews
+    memorySize: 1024
+    timeout: 10
+    # events:
+    #   - schedule: cron(0 11 * * ? *)
   
   # pre-signup trigger
   preSignupTrigger:

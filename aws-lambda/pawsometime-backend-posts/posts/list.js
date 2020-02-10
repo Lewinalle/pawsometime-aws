@@ -6,8 +6,6 @@ const TimSort = require('timsort');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.list = async (event) => {
-	// TODO: add sorting features with more fields later on
-
 	let title = '';
 	let description = '';
 	let userName = '';

@@ -6,8 +6,6 @@ const AWS = require('aws-sdk');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.create = async (event) => {
-	// TODO: Upload image and save url to image field (data.avatar)
-
 	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
 

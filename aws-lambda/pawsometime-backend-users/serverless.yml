@@ -65,6 +65,9 @@ functions:
           path: users/{id}
           method: put
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
   deleteUsers:
     handler: users/delete.delete
@@ -73,6 +76,9 @@ functions:
           path: users/{id}
           method: delete
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   friendsRequest:
     handler: users/friends.request
@@ -81,6 +87,9 @@ functions:
           path: users/friends/request
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
       
   friendsAccept:
     handler: users/friends.accept
@@ -89,6 +98,9 @@ functions:
           path: users/friends/accept
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   friendsReject:
     handler: users/friends.reject
@@ -97,6 +109,9 @@ functions:
           path: users/friends/reject
           method: post
           cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
 resources:
   Resources:

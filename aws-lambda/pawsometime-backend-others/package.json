@@ -7,6 +7,7 @@
 	"dependencies": {
 		"aws-sdk": "^2.612.0",
 		"uuid": "^3.4.0",
-		"timsort": "^0.3.0"
+		"timsort": "^0.3.0",
+		"axios": "^0.19.2"
 	}
 }
