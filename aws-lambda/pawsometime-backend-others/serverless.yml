@@ -97,10 +97,6 @@ functions:
     # events:
     #   - schedule: cron(0 11 * * ? *)
   
-  # pre-signup trigger
-  preSignupTrigger:
-    handler: users/preSignupTrigger.preSignupTrigger
-  
   # test handler for fast-responst
   testGet:
     handler: handler.get

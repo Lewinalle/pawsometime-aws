@@ -113,6 +113,32 @@ functions:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
+  friendsCancel:
+    handler: users/friends.cancel
+    events:
+      - http:
+          path: users/friends/cancel
+          method: post
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+
+  friendsRemove:
+    handler: users/friends.remove
+    events:
+      - http:
+          path: users/friends/remove
+          method: post
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+  
+  # pre-signup trigger
+  preSignupTrigger:
+    handler: users/preSignupTrigger.preSignupTrigger
+
 resources:
   Resources:
     # users table

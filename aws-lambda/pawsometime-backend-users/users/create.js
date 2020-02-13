@@ -37,12 +37,12 @@ module.exports.create = async (event) => {
 			username: data.username,
 			description: data.description,
 			avatar: data.avatar ? data.avatar : null,
+			neverLoggedIn: true,
 			friends: {
 				pending: [],
 				sent: [],
 				friends: []
 			},
-			confirmed: false,
 			createdAt: timestamp,
 			updatedAt: timestamp
 		}

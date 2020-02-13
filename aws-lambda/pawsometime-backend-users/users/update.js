@@ -7,6 +7,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.update = async (event) => {
 	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
+	console.log(data);
 
 	let attrValues = {};
 	let updateExp = '';
@@ -39,12 +40,12 @@ module.exports.update = async (event) => {
 		updateExp += 'avatar = :avatar';
 	}
 
-	if (data.confirmed && typeof data.confirmed === 'boolean') {
-		attrValues[':confirmed'] = data.confirmed;
+	if (data.neverLoggedIn !== undefined && typeof data.neverLoggedIn === 'boolean') {
+		attrValues[':neverLoggedIn'] = data.neverLoggedIn;
 		if (updateExp !== '') {
 			updateExp += ', ';
 		}
-		updateExp += 'confirmed = :confirmed';
+		updateExp += 'neverLoggedIn = :neverLoggedIn';
 	}
 
 	if (updateExp === '') {

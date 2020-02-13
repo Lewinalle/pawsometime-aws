@@ -30,6 +30,7 @@ module.exports.preSignupTrigger = async (event) => {
 			username,
 			description: null,
 			avatar: null,
+			neverLoggedIn: true,
 			friends: {
 				pending: [],
 				sent: [],

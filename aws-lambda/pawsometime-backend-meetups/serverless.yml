@@ -83,6 +83,17 @@ functions:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
+  autoJoinMeeups:
+    handler: meetups/join.autoJoin
+    events:
+      - http:
+          path: meetups/{id}/join
+          method: post
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+            
   requestJoinMeeups:
     handler: meetups/join.request
     events:

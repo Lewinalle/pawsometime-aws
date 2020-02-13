@@ -6,6 +6,7 @@ const TimSort = require('timsort');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const MAX_OFFSET = 0.1;
+const DEFAULT_NUM_ITEMS = 50;
 
 module.exports.list = async (event) => {
 	let title = '';
@@ -115,9 +116,17 @@ module.exports.list = async (event) => {
 			else return 1;
 		});
 
+		let page =
+			event.queryStringParameters &&
+			event.queryStringParameters.page &&
+			!isNaN(Number(event.queryStringParameters.page)) &&
+			Number(event.queryStringParameters.page) > 1
+				? ~~Number(event.queryStringParameters.page)
+				: 1;
+
 		return {
 			statusCode: 200,
-			body: JSON.stringify(res.Items)
+			body: JSON.stringify(res.Items.slice((page - 1) * DEFAULT_NUM_ITEMS, page * DEFAULT_NUM_ITEMS - 1))
 		};
 	} catch (err) {
 		console.log(err);
