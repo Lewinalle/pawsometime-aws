@@ -16,6 +16,12 @@ module.exports.get = async (event) => {
 		const res = await dynamoDb.get(params).promise();
 		console.log(res);
 
+		TimSort.sort(res.Item.comments, (a, b) => {
+			if (a.createdAt === b.createdAt) return 0;
+			else if (a.createdAt < b.createdAt) return -1;
+			else return 1;
+		});
+
 		return {
 			statusCode: 200,
 			body: JSON.stringify(res.Item)

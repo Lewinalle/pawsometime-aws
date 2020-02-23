@@ -12,7 +12,7 @@ module.exports.update = async (event) => {
 	let updateExp = '';
 
 	// validation
-	if (Object.keys(data).length === 0 && data.constructor === Object) {
+	if (typeof data.type !== 'string' || (Object.keys(data).length === 0 && data.constructor === Object)) {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -61,8 +61,27 @@ module.exports.update = async (event) => {
 	attrValues[':updatedAt'] = timestamp;
 	updateExp += ', updatedAt = :updatedAt';
 
+	let dbTable;
+	if (data.type.toLowerCase() === 'general') {
+		dbTable = process.env.GENERAL_POSTS_TABLE;
+	} else if (data.type.toLowerCase() === 'tips') {
+		dbTable = process.env.TIP_POSTS_TABLE;
+	} else if (data.type.toLowerCase() === 'qna') {
+		dbTable = process.env.QNA_POSTS_TABLE;
+	} else if (data.type.toLowerCase() === 'trade') {
+		dbTable = process.env.TRADE_POSTS_TABLE;
+	} else {
+		return {
+			statusCode: 400,
+			body: JSON.stringify({
+				developerMessage: 'Validation Failed! type is not valid',
+				userMessage: 'Valid type of post must be provided'
+			})
+		};
+	}
+
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: dbTable,
 		Key: {
 			id: event.pathParameters.id
 		},

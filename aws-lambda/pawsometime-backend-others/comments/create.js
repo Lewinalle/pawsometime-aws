@@ -32,8 +32,14 @@ module.exports.create = async (event) => {
 
 	if (data.resource.toLowerCase() === 'meetups') {
 		tableName = process.env.MEETUPS_TABLE;
-	} else if (data.resource.toLowerCase() === 'posts') {
-		tableName = process.env.POSTS_TABLE;
+	} else if (data.resource.toLowerCase() === 'posts_tips') {
+		tableName = process.env.TIP_POSTS_TABLE;
+	} else if (data.resource.toLowerCase() === 'posts_qna') {
+		tableName = process.env.QNA_POSTS_TABLE;
+	} else if (data.resource.toLowerCase() === 'posts_trade') {
+		tableName = process.env.TRADE_POSTS_TABLE;
+	} else if (data.resource.toLowerCase() === 'posts_general') {
+		tableName = process.env.GENERAL_POSTS_TABLE;
 	} else {
 		return {
 			statusCode: 422,

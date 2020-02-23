@@ -5,11 +5,11 @@ const AWS = require('aws-sdk');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3();
 
-module.exports.delete = async (event) => {
+const performDelete = async (dbTable, id) => {
 	const getParams = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: dbTable,
 		Key: {
-			id: event.pathParameters.id
+			id
 		}
 	};
 
@@ -36,15 +36,15 @@ module.exports.delete = async (event) => {
 	}
 
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: dbTable,
 		Key: {
-			id: event.pathParameters.id
+			id
 		}
 	};
 
 	try {
 		const res = await dynamoDb.delete(params).promise();
-		console.log(res);
+		console.log('res : ' + JSON.stringify(res));
 
 		return {
 			statusCode: 200,
@@ -58,4 +58,32 @@ module.exports.delete = async (event) => {
 			body: JSON.stringify(err)
 		};
 	}
+};
+
+module.exports.typeGeneral = async (event) => {
+	const dbTable = process.env.GENERAL_POSTS_TABLE;
+	const id = event.pathParameters.id;
+
+	return await performDelete(dbTable, id);
+};
+
+module.exports.typeTips = async (event) => {
+	const dbTable = process.env.TIPS_POSTS_TABLE;
+	const id = event.pathParameters.id;
+
+	return await performDelete(dbTable, id);
+};
+
+module.exports.typeQna = async (event) => {
+	const dbTable = process.env.QNA_POSTS_TABLE;
+	const id = event.pathParameters.id;
+
+	return await performDelete(dbTable, id);
+};
+
+module.exports.typeTrade = async (event) => {
+	const dbTable = process.env.TRADE_POSTS_TABLE;
+	const id = event.pathParameters.id;
+
+	return await performDelete(dbTable, id);
 };

@@ -14,7 +14,8 @@ module.exports.create = async (event) => {
 		typeof data.title !== 'string' ||
 		typeof data.description !== 'string' ||
 		typeof data.userId !== 'string' ||
-		typeof data.userName !== 'string'
+		typeof data.userName !== 'string' ||
+		typeof data.type !== 'string'
 	) {
 		console.error('Validation Failed!');
 		return {
@@ -26,8 +27,27 @@ module.exports.create = async (event) => {
 		};
 	}
 
+	let dbTable;
+	if (data.type.toLowerCase() === 'general') {
+		dbTable = process.env.GENERAL_POSTS_TABLE;
+	} else if (data.type.toLowerCase() === 'tips') {
+		dbTable = process.env.TIP_POSTS_TABLE;
+	} else if (data.type.toLowerCase() === 'qna') {
+		dbTable = process.env.QNA_POSTS_TABLE;
+	} else if (data.type.toLowerCase() === 'trade') {
+		dbTable = process.env.TRADE_POSTS_TABLE;
+	} else {
+		return {
+			statusCode: 400,
+			body: JSON.stringify({
+				developerMessage: 'Validation Failed! type is not valid',
+				userMessage: 'Valid type of post must be provided'
+			})
+		};
+	}
+
 	const params = {
-		TableName: process.env.POSTS_TABLE,
+		TableName: dbTable,
 		Item: {
 			id: uuid.v4(),
 			title: data.title,

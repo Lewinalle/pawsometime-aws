@@ -5,7 +5,7 @@ const TimSort = require('timsort');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-https: module.exports.get = async (event) => {
+module.exports.get = async (event) => {
 	const params = {
 		TableName: process.env.NEWS_TABLE
 	};

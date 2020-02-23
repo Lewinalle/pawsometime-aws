@@ -87,10 +87,10 @@ module.exports.list = async (event) => {
 
 	try {
 		console.log('params: ' + JSON.stringify(params));
-		let res = await dynamoDb.scan(params).promise();
+		let res = await getAllData(params);
 		console.log('res: ' + JSON.stringify(res));
 
-		TimSort.sort(res.Items, (a, b) => {
+		TimSort.sort(res, (a, b) => {
 			if (a.username === b.username) return 0;
 			else if (a.username < b.username) return -1;
 			else return 1;
@@ -98,7 +98,7 @@ module.exports.list = async (event) => {
 
 		return {
 			statusCode: 200,
-			body: JSON.stringify(res.Items)
+			body: JSON.stringify(res)
 		};
 	} catch (err) {
 		console.log(err);
@@ -108,4 +108,28 @@ module.exports.list = async (event) => {
 			body: JSON.stringify(err)
 		};
 	}
+};
+
+const getAllData = async (params) => {
+	let allData = [];
+
+	let data = await dynamoDb.scan(params).promise();
+
+	if (data['Items'].length > 0) {
+		allData = [ ...allData, ...data['Items'] ];
+	}
+
+	while (data.LastEvaluatedKey) {
+		console.log('There are more items to search (over 1MB). Fetching More!');
+		params.ExclusiveStartKey = data.LastEvaluatedKey;
+
+		let data = await dynamoDb.scan(params).promise();
+
+		if (data['Items'].length > 0) {
+			allData = [ ...allData, ...data['Items'] ];
+		}
+	}
+
+	console.log('Fetching Done!');
+	return allData;
 };

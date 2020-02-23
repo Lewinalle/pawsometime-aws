@@ -6,7 +6,7 @@ const TimSort = require('timsort');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const MAX_OFFSET = 0.1;
-const DEFAULT_NUM_ITEMS = 50;
+const DEFAULT_NUM_ITEMS = 200;
 
 module.exports.list = async (event) => {
 	let title = '';
@@ -106,16 +106,6 @@ module.exports.list = async (event) => {
 	}
 
 	try {
-		console.log('params: ' + JSON.stringify(params));
-		let res = await dynamoDb.scan(params).promise();
-		console.log('res: ' + JSON.stringify(res));
-
-		TimSort.sort(res.Items, (a, b) => {
-			if (a.updatedAt === b.updatedAt) return 0;
-			else if (a.updatedAt > b.updatedAt) return -1;
-			else return 1;
-		});
-
 		let page =
 			event.queryStringParameters &&
 			event.queryStringParameters.page &&
@@ -124,9 +114,19 @@ module.exports.list = async (event) => {
 				? ~~Number(event.queryStringParameters.page)
 				: 1;
 
+		console.log('params: ' + JSON.stringify(params));
+		let res = await getAllData(params, page);
+		console.log('res: ' + JSON.stringify(res));
+
+		TimSort.sort(res, (a, b) => {
+			if (a.updatedAt === b.updatedAt) return 0;
+			else if (a.updatedAt > b.updatedAt) return -1;
+			else return 1;
+		});
+
 		return {
 			statusCode: 200,
-			body: JSON.stringify(res.Items.slice((page - 1) * DEFAULT_NUM_ITEMS, page * DEFAULT_NUM_ITEMS - 1))
+			body: JSON.stringify(res.slice(0, page * DEFAULT_NUM_ITEMS - 1))
 		};
 	} catch (err) {
 		console.log(err);
@@ -136,4 +136,28 @@ module.exports.list = async (event) => {
 			body: JSON.stringify(err)
 		};
 	}
+};
+
+const getAllData = async (params, page) => {
+	let allData = [];
+
+	let data = await dynamoDb.scan(params).promise();
+
+	if (data['Items'].length > 0) {
+		allData = [ ...allData, ...data['Items'] ];
+	}
+
+	while (data.LastEvaluatedKey && allData.length < page * DEFAULT_NUM_ITEMS) {
+		console.log('There are more items to search (over 1MB). Fetching More!');
+		params.ExclusiveStartKey = data.LastEvaluatedKey;
+
+		let data = await dynamoDb.scan(params).promise();
+
+		if (data['Items'].length > 0) {
+			allData = [ ...allData, ...data['Items'] ];
+		}
+	}
+
+	console.log('Fetching Done!');
+	return allData;
 };

@@ -8,7 +8,10 @@ provider:
   region: us-west-2
   memorySize: 512
   environment:
-    POSTS_TABLE: pawsometime-backend-posts-posts
+    TIP_POSTS_TABLE: pawsometime-backend-posts-tip
+    QNA_POSTS_TABLE: pawsometime-backend-posts-qna
+    TRADE_POSTS_TABLE: pawsometime-backend-posts-trade
+    GENERAL_POSTS_TABLE: pawsometime-backend-posts-general
     MEETUPS_TABLE: pawsometime-backend-meetups-meetups
     USERS_TABLE: pawsometime-backend-users-users
     NEWS_TABLE: pawsometime-backend-others-news
@@ -22,7 +25,10 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TIP_POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.QNA_POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TRADE_POSTS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.GENERAL_POSTS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
@@ -72,34 +78,118 @@ functions:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
-  deletePosts:
-    handler: posts/delete.delete
+  deleteGeneralPosts:
+    handler: posts/delete.typeGeneral
     events:
       - http:
-          path: posts/{id}
+          path: posts/general/{id}
+          method: delete
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+          
+  deleteTipsPosts:
+    handler: posts/delete.typeTips
+    events:
+      - http:
+          path: posts/tips/{id}
           method: delete
           cors: true
           authorizer:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
-resources:
-  Resources:
-    # posts table
-    PostsDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.POSTS_TABLE}
+  deleteQnaPosts:
+    handler: posts/delete.typeQna
+    events:
+      - http:
+          path: posts/qna/{id}
+          method: delete
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+
+  deleteTradePosts:
+    handler: posts/delete.typeTrade
+    events:
+      - http:
+          path: posts/trade/{id}
+          method: delete
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+
+# resources:
+#   Resources:
+#     # posts table
+#     TipPostsDynamoDbTable:
+#       Type: 'AWS::DynamoDB::Table'
+#       DeletionPolicy: Retain
+#       Properties:
+#         AttributeDefinitions:
+#           -
+#             AttributeName: id
+#             AttributeType: S
+#         KeySchema:
+#           -
+#             AttributeName: id
+#             KeyType: HASH
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 1
+#           WriteCapacityUnits: 1
+#         TableName: ${self:provider.environment.TIP_POSTS_TABLE}
+
+#     QnaPostsDynamoDbTable:
+#       Type: 'AWS::DynamoDB::Table'
+#       DeletionPolicy: Retain
+#       Properties:
+#         AttributeDefinitions:
+#           -
+#             AttributeName: id
+#             AttributeType: S
+#         KeySchema:
+#           -
+#             AttributeName: id
+#             KeyType: HASH
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 1
+#           WriteCapacityUnits: 1
+#         TableName: ${self:provider.environment.QNA_POSTS_TABLE}
+
+#     TradePostsDynamoDbTable:
+#       Type: 'AWS::DynamoDB::Table'
+#       DeletionPolicy: Retain
+#       Properties:
+#         AttributeDefinitions:
+#           -
+#             AttributeName: id
+#             AttributeType: S
+#         KeySchema:
+#           -
+#             AttributeName: id
+#             KeyType: HASH
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 1
+#           WriteCapacityUnits: 1
+#         TableName: ${self:provider.environment.TRADE_POSTS_TABLE}
+
+#     GeneralPostsDynamoDbTable:
+#       Type: 'AWS::DynamoDB::Table'
+#       DeletionPolicy: Retain
+#       Properties:
+#         AttributeDefinitions:
+#           -
+#             AttributeName: id
+#             AttributeType: S
+#         KeySchema:
+#           -
+#             AttributeName: id
+#             KeyType: HASH
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 1
+#           WriteCapacityUnits: 1
+#         TableName: ${self:provider.environment.GENERAL_POSTS_TABLE}
     
