@@ -7,6 +7,8 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.delete = async (event) => {
 	const data = JSON.parse(event.body);
 
+	console.log(data, event.pathParameters);
+
 	let comments = [];
 	let newComments = [];
 

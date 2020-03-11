@@ -1,6 +1,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const TimSort = require('timsort');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 

@@ -19,7 +19,7 @@ module.exports.list = async (event) => {
 
 		attrValues[':username'] = username;
 		if (filterExp !== '') {
-			filterExp += ' AND ';
+			filterExp += ' OR ';
 		}
 		filterExp += 'contains (username, :username)';
 	}
@@ -30,7 +30,7 @@ module.exports.list = async (event) => {
 
 		attrValues[':description'] = description;
 		if (filterExp !== '') {
-			filterExp += ' AND ';
+			filterExp += ' OR ';
 		}
 		filterExp += 'contains (description, :description)';
 	}
