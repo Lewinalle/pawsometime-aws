@@ -14,6 +14,7 @@ provider:
     GENERAL_POSTS_TABLE: pawsometime-backend-posts-general
     MEETUPS_TABLE: pawsometime-backend-meetups-meetups
     USERS_TABLE: pawsometime-backend-users-users
+    HISTORY_TABLE: pawsometime-backend-others-history
     NEWS_TABLE: pawsometime-backend-others-news
     S3_BUCKET: pawsometime-serverless-s3
   iamRoleStatements:
@@ -32,6 +33,7 @@ provider:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.GENERAL_POSTS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
     - Effect: Allow
       Action:
@@ -131,3 +133,20 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NEWS_TABLE}
+    # news table
+    HistoryDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.HISTORY_TABLE}
