@@ -17,6 +17,7 @@ provider:
     HISTORY_TABLE: pawsometime-backend-others-history
     NEWS_TABLE: pawsometime-backend-others-news
     S3_BUCKET: pawsometime-serverless-s3
+    GALLERY_TABLE: pawsometime-backend-others-gallery
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -35,6 +36,7 @@ provider:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.GALLERY_TABLE}"
     - Effect: Allow
       Action:
         - "s3:*"
@@ -88,6 +90,17 @@ functions:
           authorizer:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+
+  # s3GetUrl:
+  #   handler: s3/getSignedUrl.getSignedUrl
+  #   events:
+  #     - http:
+  #         path: s3/getSignedUrl
+  #         method: post
+  #         cors: true      
+  #         # authorizer:
+  #         #   name: cognito-token-authorization
+  #         #   arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
   # news endpoints
   getNews:

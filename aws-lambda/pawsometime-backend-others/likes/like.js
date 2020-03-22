@@ -26,6 +26,8 @@ module.exports.like = async (event) => {
 
 	if (data.resource.toLowerCase() === 'meetups') {
 		tableName = process.env.MEETUPS_TABLE;
+	} else if (data.resource.toLowerCase() === 'gallery') {
+		tableName = process.env.GALLERY_TABLE;
 	} else if (data.resource.toLowerCase() === 'posts_tips') {
 		tableName = process.env.TIP_POSTS_TABLE;
 	} else if (data.resource.toLowerCase() === 'posts_qna') {

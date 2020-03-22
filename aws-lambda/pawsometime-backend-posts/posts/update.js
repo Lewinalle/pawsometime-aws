@@ -1,5 +1,6 @@
 'use strict';
 
+const uuid = require('uuid');
 const AWS = require('aws-sdk');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -90,9 +91,53 @@ module.exports.update = async (event) => {
 		ReturnValues: 'ALL_NEW'
 	};
 
+	const getParams = {
+		TableName: dbTable,
+		Key: {
+			id: event.pathParameters.id
+		}
+	};
+
+	let getRes;
+	try {
+		getRes = await dynamoDb.get(getParams).promise();
+		console.log(getRes);
+
+		if (!getRes || !getRes.Item) {
+			return {
+				statusCode: 422,
+				body: JSON.stringify(err)
+			};
+		}
+	} catch (err) {
+		console.log(err);
+
+		return {
+			statusCode: 422,
+			body: JSON.stringify(err)
+		};
+	}
+
+	const historyParams = {
+		TableName: process.env.HISTORY_TABLE,
+		Item: {
+			id: uuid.v4(),
+			action: 'update',
+			resource: 'post',
+			resourceId: event.pathParameters.id,
+			resourceType: data.type.toLowerCase(),
+			userId: getRes.Item.userId,
+			userName: getRes.Item.userName,
+			createdAt: timestamp
+		}
+	};
+
 	try {
 		const res = await dynamoDb.update(params).promise();
 		console.log(res);
+
+		const historyRes = await dynamoDb.put(historyParams).promise();
+		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,

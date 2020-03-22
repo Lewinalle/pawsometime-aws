@@ -1,11 +1,14 @@
 'use strict';
 
+const uuid = require('uuid');
 const AWS = require('aws-sdk');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3();
 
-const performDelete = async (dbTable, id) => {
+const performDelete = async (dbTable, id, type) => {
+	const timestamp = new Date().getTime();
+
 	const getParams = {
 		TableName: dbTable,
 		Key: {
@@ -13,8 +16,10 @@ const performDelete = async (dbTable, id) => {
 		}
 	};
 
+	let getRes;
+
 	try {
-		const getRes = await dynamoDb.get(getParams).promise();
+		getRes = await dynamoDb.get(getParams).promise();
 
 		console.log(getRes);
 
@@ -42,9 +47,26 @@ const performDelete = async (dbTable, id) => {
 		}
 	};
 
+	const historyParams = {
+		TableName: process.env.HISTORY_TABLE,
+		Item: {
+			id: uuid.v4(),
+			action: 'delete',
+			resource: 'post',
+			resourceId: id,
+			resourceType: type,
+			userId: getRes.Item.userId,
+			userName: getRes.Item.userName,
+			createdAt: timestamp
+		}
+	};
+
 	try {
 		const res = await dynamoDb.delete(params).promise();
 		console.log('res : ' + JSON.stringify(res));
+
+		const historyRes = await dynamoDb.put(historyParams).promise();
+		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,
@@ -64,26 +86,26 @@ module.exports.typeGeneral = async (event) => {
 	const dbTable = process.env.GENERAL_POSTS_TABLE;
 	const id = event.pathParameters.id;
 
-	return await performDelete(dbTable, id);
+	return await performDelete(dbTable, id, 'general');
 };
 
 module.exports.typeTips = async (event) => {
 	const dbTable = process.env.TIPS_POSTS_TABLE;
 	const id = event.pathParameters.id;
 
-	return await performDelete(dbTable, id);
+	return await performDelete(dbTable, id, 'tips');
 };
 
 module.exports.typeQna = async (event) => {
 	const dbTable = process.env.QNA_POSTS_TABLE;
 	const id = event.pathParameters.id;
 
-	return await performDelete(dbTable, id);
+	return await performDelete(dbTable, id, 'qna');
 };
 
 module.exports.typeTrade = async (event) => {
 	const dbTable = process.env.TRADE_POSTS_TABLE;
 	const id = event.pathParameters.id;
 
-	return await performDelete(dbTable, id);
+	return await performDelete(dbTable, id, 'trade');
 };

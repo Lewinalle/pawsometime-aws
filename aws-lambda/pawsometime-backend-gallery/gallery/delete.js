@@ -10,23 +10,22 @@ module.exports.delete = async (event) => {
 	const timestamp = new Date().getTime();
 
 	const getParams = {
-		TableName: process.env.MEETUPS_TABLE,
+		TableName: process.env.GALLERY_TABLE,
 		Key: {
 			id: event.pathParameters.id
 		}
 	};
 
 	let getRes;
-
 	try {
 		getRes = await dynamoDb.get(getParams).promise();
 
 		console.log(getRes);
 
-		if (getRes.Item && getRes.Item.attachment) {
+		if (getRes.Item && getRes.Item.photo) {
 			const s3Params = {
 				Bucket: process.env.S3_BUCKET,
-				Key: getRes.Item.attachment
+				Key: getRes.Item.photo
 			};
 
 			const deleteRes = await s3.deleteObject(s3Params);
@@ -45,7 +44,7 @@ module.exports.delete = async (event) => {
 		Item: {
 			id: uuid.v4(),
 			action: 'delete',
-			resource: 'meetup',
+			resource: 'gallery',
 			resourceId: getRes.Item.id,
 			resourceType: null,
 			userId: getRes.Item.userId,
@@ -55,7 +54,7 @@ module.exports.delete = async (event) => {
 	};
 
 	const params = {
-		TableName: process.env.MEETUPS_TABLE,
+		TableName: process.env.GALLERY_TABLE,
 		Key: {
 			id: event.pathParameters.id
 		}

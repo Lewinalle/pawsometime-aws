@@ -8,7 +8,6 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.update = async (event) => {
 	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
-	console.log(data);
 
 	let attrValues = {};
 	let updateExp = '';
@@ -33,20 +32,12 @@ module.exports.update = async (event) => {
 		updateExp += 'description = :description';
 	}
 
-	if (data.avatar && typeof data.avatar === 'string') {
-		attrValues[':avatar'] = data.avatar;
+	if (data.photo && typeof data.photo === 'string') {
+		attrValues[':photo'] = data.photo;
 		if (updateExp !== '') {
 			updateExp += ', ';
 		}
-		updateExp += 'avatar = :avatar';
-	}
-
-	if (data.neverLoggedIn !== undefined && typeof data.neverLoggedIn === 'boolean') {
-		attrValues[':neverLoggedIn'] = data.neverLoggedIn;
-		if (updateExp !== '') {
-			updateExp += ', ';
-		}
-		updateExp += 'neverLoggedIn = :neverLoggedIn';
+		updateExp += 'photo = :photo';
 	}
 
 	if (updateExp === '') {
@@ -64,7 +55,7 @@ module.exports.update = async (event) => {
 	updateExp += ', updatedAt = :updatedAt';
 
 	const params = {
-		TableName: process.env.USERS_TABLE,
+		TableName: process.env.GALLERY_TABLE,
 		Key: {
 			id: event.pathParameters.id
 		},
@@ -74,7 +65,7 @@ module.exports.update = async (event) => {
 	};
 
 	const getParams = {
-		TableName: process.env.USERS_TABLE,
+		TableName: process.env.GALLERY_TABLE,
 		Key: {
 			id: event.pathParameters.id
 		}
@@ -84,6 +75,13 @@ module.exports.update = async (event) => {
 	try {
 		getRes = await dynamoDb.get(getParams).promise();
 		console.log(getRes);
+
+		if (!getRes || !getRes.Item) {
+			return {
+				statusCode: 422,
+				body: JSON.stringify(err)
+			};
+		}
 	} catch (err) {
 		console.log(err);
 
@@ -98,10 +96,10 @@ module.exports.update = async (event) => {
 		Item: {
 			id: uuid.v4(),
 			action: 'update',
-			resource: 'user',
+			resource: 'gallery',
 			resourceId: event.pathParameters.id,
 			resourceType: null,
-			userId: getRes.Item.id,
+			userId: getRes.Item.userId,
 			userName: getRes.Item.userName,
 			createdAt: timestamp
 		}

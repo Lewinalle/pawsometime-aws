@@ -1,10 +1,12 @@
 'use strict';
 
+const uuid = require('uuid');
 const AWS = require('aws-sdk');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.request = async (event) => {
+	const timestamp = new Date().getTime();
 	const data = JSON.parse(event.body);
 	let userFriendsObj;
 	let friendFriendsObj;
@@ -86,6 +88,7 @@ module.exports.request = async (event) => {
 		};
 	}
 
+	let action;
 	if (userFriendsObj.pending.includes(data.friendId)) {
 		// remove userId from friendId's sent
 		newFriendFriendsObj.sent = friendFriendsObj.sent.filter((item) => item !== data.userId);
@@ -96,12 +99,69 @@ module.exports.request = async (event) => {
 		// add each other's id to both userId's friends and friendId's friends
 		newFriendFriendsObj.friends.push(data.userId);
 		newUserFriendsObj.friends.push(data.friendId);
+
+		action = 'connect';
 	} else {
 		// add userId to friendId's pending
 		newFriendFriendsObj.pending.push(data.userId);
 
 		// add friendId to userId's sent
 		newUserFriendsObj.sent.push(data.friendId);
+
+		action = 'request';
+	}
+
+	const historyParams = {
+		TableName: process.env.HISTORY_TABLE,
+		Item: {
+			id: uuid.v4(),
+			action: action,
+			resource: 'user',
+			resourceId: data.friendId,
+			resourceType: 'friend',
+			userId: data.userId,
+			userName: data.userName,
+			createdAt: timestamp
+		}
+	};
+
+	let friendHistoryParams;
+	let getRes;
+
+	if (action === 'connect') {
+		const getParams = {
+			TableName: process.env.USERS_TABLE,
+			Key: {
+				id: data.friendId
+			}
+		};
+
+		try {
+			getRes = await dynamoDb.get(getParams).promise();
+
+			console.log(getRes);
+		} catch (err) {
+			console.log(err);
+
+			return {
+				statusCode: 422,
+				body: JSON.stringify(err)
+			};
+		}
+
+		friendHistoryParams = {
+			TableName: process.env.HISTORY_TABLE,
+			Item: {
+				id: uuid.v4(),
+				action: action,
+				resource: 'user',
+				resourceId: data.userId,
+				resourceType: 'friend',
+				userId: getRes.Item.id,
+				userName: getRes.Item.username,
+				createdAt: timestamp
+			}
+		};
 	}
 
 	try {
@@ -134,6 +194,14 @@ module.exports.request = async (event) => {
 
 		let friendUpdateRes = await dynamoDb.update(friendUpdateParams).promise();
 		console.log(friendUpdateRes);
+
+		const historyRes = await dynamoDb.put(historyParams).promise();
+		console.log('historyRes', historyRes);
+
+		if (friendHistoryParams) {
+			const friendHistoryRes = await dynamoDb.put(friendHistoryParams).promise();
+			console.log('friendHistoryRes', friendHistoryRes);
+		}
 
 		return {
 			statusCode: 200,
@@ -249,6 +317,54 @@ module.exports.accept = async (event) => {
 		newUserFriendsObj.sent = userFriendsObj.sent.filter((item) => item !== data.friendId);
 	}
 
+	const getParams = {
+		TableName: process.env.USERS_TABLE,
+		Key: {
+			id: data.friendId
+		}
+	};
+
+	try {
+		const getRes = await dynamoDb.get(getParams).promise();
+
+		console.log(getRes);
+	} catch (err) {
+		console.log(err);
+
+		return {
+			statusCode: 422,
+			body: JSON.stringify(err)
+		};
+	}
+
+	const friendHistoryParams = {
+		TableName: process.env.HISTORY_TABLE,
+		Item: {
+			id: uuid.v4(),
+			action: 'connect',
+			resource: 'user',
+			resourceId: data.userId,
+			resourceType: 'friend',
+			userId: getRes.Item.id,
+			userName: getRes.Item.username,
+			createdAt: timestamp
+		}
+	};
+
+	const historyParams = {
+		TableName: process.env.HISTORY_TABLE,
+		Item: {
+			id: uuid.v4(),
+			action: 'connect',
+			resource: 'user',
+			resourceId: data.friendId,
+			resourceType: 'friend',
+			userId: data.userId,
+			userName: data.userName,
+			createdAt: timestamp
+		}
+	};
+
 	try {
 		let userUpdateParams = {
 			TableName: process.env.USERS_TABLE,
@@ -279,6 +395,12 @@ module.exports.accept = async (event) => {
 
 		let friendUpdateRes = await dynamoDb.update(friendUpdateParams).promise();
 		console.log(friendUpdateRes);
+
+		const historyRes = await dynamoDb.put(historyParams).promise();
+		console.log('historyRes', historyRes);
+
+		const friendHistoryRes = await dynamoDb.put(friendHistoryParams).promise();
+		console.log('friendHistoryRes', friendHistoryRes);
 
 		return {
 			statusCode: 200,

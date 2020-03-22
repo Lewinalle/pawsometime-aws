@@ -38,8 +38,8 @@ module.exports.create = async (event) => {
 			isPrivate: data.isPrivate,
 			userId: data.userId,
 			userName: data.userName,
-			pending: [],
-			joined: [],
+			pending: [], // array of {userId, userName}
+			joined: [], // array of {userId, userName}
 			likes: [], // array of userIds
 			comments: [], // array of comment object (id, description, userId, userName, userAvatar, createdAt)
 			attachment: data.attachment ? data.attachment : null,
@@ -48,9 +48,27 @@ module.exports.create = async (event) => {
 		}
 	};
 
+	const historyParams = {
+		TableName: process.env.HISTORY_TABLE,
+		Item: {
+			id: uuid.v4(),
+			action: 'create',
+			resource: 'meetup',
+			resourceId: params.Item.id,
+			resourceType: null,
+			userId: data.userId,
+			userName: data.userName,
+			createdAt: timestamp
+		}
+	};
+
 	try {
 		const res = await dynamoDb.put(params).promise();
 		console.log(res);
+
+		const historyRes = await dynamoDb.put(historyParams).promise();
+
+		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,

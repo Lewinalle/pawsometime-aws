@@ -1,5 +1,5 @@
 
-service: pawsometime-backend-users
+service: pawsometime-backend-gallery
 
 provider:
   name: aws
@@ -44,116 +44,60 @@ provider:
         - "*"
 
 functions:
-  # users endpoints
-  # createUsers:
-  #   handler: users/create.create
-  #   events:
-  #     - http:
-  #         path: users
-  #         method: post
-  #         cors: true
-
-  listUsers:
-    handler: users/list.list
+  # gallery endpoints
+  createGallery:
+    handler: gallery/create.create
     events:
       - http:
-          path: users
+          path: gallery
+          method: post
+          cors: true
+          authorizer:
+            name: cognito-token-authorization
+            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
+
+  listGallery:
+    handler: gallery/list.list
+    events:
+      - http:
+          path: gallery
           method: get
           cors: true
 
-  getUsers:
-    handler: users/get.get
+  getGallery:
+    handler: gallery/get.get
     events:
       - http:
-          path: users/{id}
+          path: gallery/{id}
           method: get
           cors: true
 
-  updateUsers:
-    handler: users/update.update
+  updateGallery:
+    handler: gallery/update.update
     events:
       - http:
-          path: users/{id}
+          path: gallery/{id}
           method: put
           cors: true
           authorizer:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
   
-  deleteUsers:
-    handler: users/delete.delete
+  deleteGallery:
+    handler: gallery/delete.delete
     events:
       - http:
-          path: users/{id}
+          path: gallery/{id}
           method: delete
           cors: true
           authorizer:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
-  friendsRequest:
-    handler: users/friends.request
-    events:
-      - http:
-          path: users/friends/request
-          method: post
-          cors: true
-          authorizer:
-            name: cognito-token-authorization
-            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
-      
-  friendsAccept:
-    handler: users/friends.accept
-    events:
-      - http:
-          path: users/friends/accept
-          method: post
-          cors: true
-          authorizer:
-            name: cognito-token-authorization
-            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
-
-  friendsReject:
-    handler: users/friends.reject
-    events:
-      - http:
-          path: users/friends/reject
-          method: post
-          cors: true
-          authorizer:
-            name: cognito-token-authorization
-            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
-
-  friendsCancel:
-    handler: users/friends.cancel
-    events:
-      - http:
-          path: users/friends/cancel
-          method: post
-          cors: true
-          authorizer:
-            name: cognito-token-authorization
-            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
-
-  friendsRemove:
-    handler: users/friends.remove
-    events:
-      - http:
-          path: users/friends/remove
-          method: post
-          cors: true
-          authorizer:
-            name: cognito-token-authorization
-            arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
-  
-  # pre-signup trigger
-  preSignupTrigger:
-    handler: users/preSignupTrigger.preSignupTrigger
-
 resources:
   Resources:
-    # users table
-    UsersDynamoDbTable:
+    # Gallery table
+    GalleryDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
@@ -168,4 +112,5 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.USERS_TABLE}
+        TableName: ${self:provider.environment.GALLERY_TABLE}
+    

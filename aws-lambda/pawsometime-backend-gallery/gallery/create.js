@@ -10,13 +10,7 @@ module.exports.create = async (event) => {
 	const data = JSON.parse(event.body);
 
 	// validation
-	if (
-		typeof data.title !== 'string' ||
-		typeof data.description !== 'string' ||
-		typeof data.userId !== 'string' ||
-		typeof data.userName !== 'string' ||
-		typeof data.type !== 'string'
-	) {
+	if (typeof data.description !== 'string' || typeof data.userId !== 'string') {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -27,36 +21,16 @@ module.exports.create = async (event) => {
 		};
 	}
 
-	let dbTable;
-	if (data.type.toLowerCase() === 'general') {
-		dbTable = process.env.GENERAL_POSTS_TABLE;
-	} else if (data.type.toLowerCase() === 'tips') {
-		dbTable = process.env.TIP_POSTS_TABLE;
-	} else if (data.type.toLowerCase() === 'qna') {
-		dbTable = process.env.QNA_POSTS_TABLE;
-	} else if (data.type.toLowerCase() === 'trade') {
-		dbTable = process.env.TRADE_POSTS_TABLE;
-	} else {
-		return {
-			statusCode: 400,
-			body: JSON.stringify({
-				developerMessage: 'Validation Failed! type is not valid',
-				userMessage: 'Valid type of post must be provided'
-			})
-		};
-	}
-
 	const params = {
-		TableName: dbTable,
+		TableName: process.env.GALLERY_TABLE,
 		Item: {
 			id: uuid.v4(),
-			title: data.title,
 			description: data.description,
 			userId: data.userId,
 			userName: data.userName,
-			likes: [], // array of userId
+			likes: [], // array of userIds
 			comments: [], // array of comment object (id, description, userId, userName, userAvatar, createdAt)
-			attachment: data.attachment ? data.attachment : null,
+			photo: data.photo ? data.photo : null,
 			createdAt: timestamp,
 			updatedAt: timestamp
 		}
@@ -67,9 +41,9 @@ module.exports.create = async (event) => {
 		Item: {
 			id: uuid.v4(),
 			action: 'create',
-			resource: 'post',
+			resource: 'gallery',
 			resourceId: params.Item.id,
-			resourceType: data.type.toLowerCase(),
+			resourceType: null,
 			userId: data.userId,
 			userName: data.userName,
 			createdAt: timestamp
@@ -81,6 +55,7 @@ module.exports.create = async (event) => {
 		console.log(res);
 
 		const historyRes = await dynamoDb.put(historyParams).promise();
+
 		console.log('historyRes', historyRes);
 
 		return {

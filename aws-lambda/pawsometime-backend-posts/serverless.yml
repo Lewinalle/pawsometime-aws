@@ -14,7 +14,10 @@ provider:
     GENERAL_POSTS_TABLE: pawsometime-backend-posts-general
     MEETUPS_TABLE: pawsometime-backend-meetups-meetups
     USERS_TABLE: pawsometime-backend-users-users
+    HISTORY_TABLE: pawsometime-backend-others-history
     NEWS_TABLE: pawsometime-backend-others-news
+    GALLERY_TABLE: pawsometime-backend-others-gallery
+    S3_BUCKET: pawsometime-serverless-s3
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -30,8 +33,10 @@ provider:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TRADE_POSTS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.GENERAL_POSTS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MEETUPS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.HISTORY_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.NEWS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.GALLERY_TABLE}"
     - Effect: Allow
       Action:
         - "s3:*"
