@@ -35,7 +35,7 @@ module.exports.create = async (event) => {
 			title: data.title,
 			description: data.description,
 			latlon: data.latlon,
-			isPrivate: data.isPrivate,
+			isPrivate: data.isPrivate ? data.isPrivate : false,
 			userId: data.userId,
 			userName: data.userName,
 			pending: [], // array of {userId, userName}

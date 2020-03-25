@@ -5,7 +5,7 @@ const TimSort = require('timsort');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const MAX_OFFSET = 0.1;
+const MAX_OFFSET = 0.13;
 const DEFAULT_NUM_ITEMS = 200;
 
 module.exports.list = async (event) => {

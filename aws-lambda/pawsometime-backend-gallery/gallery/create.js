@@ -10,7 +10,12 @@ module.exports.create = async (event) => {
 	const data = JSON.parse(event.body);
 
 	// validation
-	if (typeof data.description !== 'string' || typeof data.userId !== 'string') {
+	if (
+		typeof data.description !== 'string' ||
+		typeof data.userId !== 'string' ||
+		typeof data.userName !== 'string' ||
+		typeof data.photo !== 'string'
+	) {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -30,7 +35,7 @@ module.exports.create = async (event) => {
 			userName: data.userName,
 			likes: [], // array of userIds
 			comments: [], // array of comment object (id, description, userId, userName, userAvatar, createdAt)
-			photo: data.photo ? data.photo : null,
+			photo: data.photo,
 			createdAt: timestamp,
 			updatedAt: timestamp
 		}

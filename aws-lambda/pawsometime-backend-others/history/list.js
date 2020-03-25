@@ -36,7 +36,7 @@ module.exports.list = async (event) => {
 	}
 
 	let params = {
-		TableName: process.env.MEETUPS_TABLE
+		TableName: process.env.HISTORY_TABLE
 	};
 
 	if (filterExp !== '') {
