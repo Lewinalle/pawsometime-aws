@@ -5,7 +5,7 @@ const TimSort = require('timsort');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const MAX_OFFSET = 0.13;
+const MAX_OFFSET = 0.16;
 const DEFAULT_NUM_ITEMS = 200;
 
 module.exports.list = async (event) => {
@@ -21,70 +21,6 @@ module.exports.list = async (event) => {
 	let attrValues = {};
 	let filterExp = '';
 
-	// check latlon and offset
-	if (!event.queryStringParameters || !event.queryStringParameters.lat || !event.queryStringParameters.lon) {
-		return {
-			statusCode: 400,
-			body: JSON.stringify({
-				developerMessage: 'Validation Failed! lat and lon param missing.',
-				userMessage: 'lat and lon param must be provided.'
-			})
-		};
-	}
-
-	// set lat & lon
-	lat = Number(event.queryStringParameters.lat);
-	lon = Number(event.queryStringParameters.lon);
-	console.log(lat, lon, offset);
-
-	// set offset
-	if (!event.queryStringParameters.offset || Number(event.queryStringParameters.offset) > MAX_OFFSET) {
-		offset = Number(MAX_OFFSET);
-	} else {
-		offset = Number(event.queryStringParameters.offset);
-	}
-
-	// set filterValues and filterExpression
-	attrValues[':minLat'] = lat - offset;
-	attrValues[':maxLat'] = lat + offset;
-	attrValues[':minLon'] = lon - offset;
-	attrValues[':maxLon'] = lon + offset;
-
-	filterExp += '(latlon.lat between :minLat and :maxLat) AND (latlon.lon between :minLon and :maxLon)';
-
-	// search title
-	if (event.queryStringParameters && event.queryStringParameters.title) {
-		title = event.queryStringParameters.title;
-
-		attrValues[':title'] = title;
-		if (filterExp !== '') {
-			filterExp += ' AND ';
-		}
-		filterExp += 'contains (title, :title)';
-	}
-
-	// search description
-	if (event.queryStringParameters && event.queryStringParameters.description) {
-		description = event.queryStringParameters.description;
-
-		attrValues[':description'] = description;
-		if (filterExp !== '') {
-			filterExp += ' AND ';
-		}
-		filterExp += 'contains (description, :description)';
-	}
-
-	// search userName
-	if (event.queryStringParameters && event.queryStringParameters.userName) {
-		userName = event.queryStringParameters.userName;
-
-		attrValues[':userName'] = userName;
-		if (filterExp !== '') {
-			filterExp += ' AND ';
-		}
-		filterExp += 'contains (userName, :userName)';
-	}
-
 	// search userId
 	if (event.queryStringParameters && event.queryStringParameters.userId) {
 		userId = event.queryStringParameters.userId;
@@ -94,6 +30,70 @@ module.exports.list = async (event) => {
 			filterExp += ' AND ';
 		}
 		filterExp += 'userId = :userId';
+	} else {
+		// check latlon and offset
+		if (!event.queryStringParameters || !event.queryStringParameters.lat || !event.queryStringParameters.lon) {
+			return {
+				statusCode: 400,
+				body: JSON.stringify({
+					developerMessage: 'Validation Failed! lat and lon param missing.',
+					userMessage: 'lat and lon param must be provided.'
+				})
+			};
+		}
+
+		// set lat & lon
+		lat = Number(event.queryStringParameters.lat);
+		lon = Number(event.queryStringParameters.lon);
+		console.log(lat, lon, offset);
+
+		// set offset
+		if (!event.queryStringParameters.offset || Number(event.queryStringParameters.offset) > MAX_OFFSET) {
+			offset = Number(MAX_OFFSET);
+		} else {
+			offset = Number(event.queryStringParameters.offset);
+		}
+
+		// set filterValues and filterExpression
+		attrValues[':minLat'] = lat - offset;
+		attrValues[':maxLat'] = lat + offset;
+		attrValues[':minLon'] = lon - offset;
+		attrValues[':maxLon'] = lon + offset;
+
+		filterExp += '(latlon.lat between :minLat and :maxLat) AND (latlon.lon between :minLon and :maxLon)';
+
+		// search title
+		if (event.queryStringParameters && event.queryStringParameters.title) {
+			title = event.queryStringParameters.title;
+
+			attrValues[':title'] = title;
+			if (filterExp !== '') {
+				filterExp += ' AND ';
+			}
+			filterExp += 'contains (title, :title)';
+		}
+
+		// search description
+		if (event.queryStringParameters && event.queryStringParameters.description) {
+			description = event.queryStringParameters.description;
+
+			attrValues[':description'] = description;
+			if (filterExp !== '') {
+				filterExp += ' AND ';
+			}
+			filterExp += 'contains (description, :description)';
+		}
+
+		// search userName
+		if (event.queryStringParameters && event.queryStringParameters.userName) {
+			userName = event.queryStringParameters.userName;
+
+			attrValues[':userName'] = userName;
+			if (filterExp !== '') {
+				filterExp += ' AND ';
+			}
+			filterExp += 'contains (userName, :userName)';
+		}
 	}
 
 	let params = {

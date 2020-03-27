@@ -10,12 +10,7 @@ module.exports.create = async (event) => {
 	const data = JSON.parse(event.body);
 
 	// validation
-	if (
-		typeof data.description !== 'string' ||
-		typeof data.userId !== 'string' ||
-		typeof data.userName !== 'string' ||
-		typeof data.photo !== 'string'
-	) {
+	if (typeof data.userId !== 'string' || typeof data.userName !== 'string' || typeof data.photo !== 'string') {
 		console.error('Validation Failed!');
 		return {
 			statusCode: 400,
@@ -30,7 +25,7 @@ module.exports.create = async (event) => {
 		TableName: process.env.GALLERY_TABLE,
 		Item: {
 			id: uuid.v4(),
-			description: data.description,
+			description: data.description ? data.description : null,
 			userId: data.userId,
 			userName: data.userName,
 			likes: [], // array of userIds

@@ -12,6 +12,7 @@ module.exports.update = async (event) => {
 
 	let attrValues = {};
 	let updateExp = '';
+	let shouldLog = false;
 
 	// validation
 	if (Object.keys(data).length === 0 && data.constructor === Object) {
@@ -31,6 +32,7 @@ module.exports.update = async (event) => {
 			updateExp += ', ';
 		}
 		updateExp += 'description = :description';
+		shouldLog = true;
 	}
 
 	if (data.avatar && typeof data.avatar === 'string') {
@@ -39,6 +41,7 @@ module.exports.update = async (event) => {
 			updateExp += ', ';
 		}
 		updateExp += 'avatar = :avatar';
+		shouldLog = true;
 	}
 
 	if (data.neverLoggedIn !== undefined && typeof data.neverLoggedIn === 'boolean') {
@@ -111,8 +114,10 @@ module.exports.update = async (event) => {
 		const res = await dynamoDb.update(params).promise();
 		console.log(res);
 
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
+		if (shouldLog === true) {
+			const historyRes = await dynamoDb.put(historyParams).promise();
+			console.log('historyRes', historyRes);
+		}
 
 		return {
 			statusCode: 200,

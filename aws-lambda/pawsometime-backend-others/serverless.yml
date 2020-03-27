@@ -111,12 +111,37 @@ functions:
           method: get
           cors: true
 
+  # history endpoints
+  listHistory:
+    handler: history/list.list
+    events:
+      - http:
+          path: history
+          method: get
+          cors: true
+
+  getHistory:
+    handler: history/get.get
+    events:
+      - http:
+          path: history/{id}
+          method: get
+          cors: true
+
+  # cronNews:
+  #   handler: news/cronNews.cronNews
+  #   timeout: 10
+  #   # events:
+  #   #   - schedule: cron(0 11 * * ? *)
+
   cronNews:
     handler: news/cronNews.cronNews
-    memorySize: 1024
     timeout: 10
-    # events:
-    #   - schedule: cron(0 11 * * ? *)
+    events:
+      - http:
+          path: news/cron
+          method: get
+          cors: true
   
   # test handler for fast-responst
   testGet:

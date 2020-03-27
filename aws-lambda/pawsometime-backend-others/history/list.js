@@ -7,32 +7,52 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.list = async (event) => {
 	let userId = '';
+	let userIds = [];
 
 	let attrValues = {};
 	let filterExp = '';
 
-	// search userName
-	if (event.queryStringParameters && event.queryStringParameters.from && event.queryStringParameters.to) {
-		from = event.queryStringParameters.from;
-		to = event.queryStringParameters.to;
+	if (event.queryStringParameters && event.queryStringParameters.friendsActivity) {
+		console.log(event.queryStringParameters.friendsActivity);
+		userIds = JSON.parse(event.queryStringParameters.friendsActivity);
 
-		attrValues[':from'] = from;
-		attrValues[':to'] = to;
+		let orQuery = '';
+		for (let index in userIds) {
+			let key = ':id' + index;
+			attrValues[key] = userIds[index];
+			if (orQuery !== '') {
+				orQuery += ' OR ';
+			}
+			orQuery += 'userId = ' + key;
+		}
 		if (filterExp !== '') {
 			filterExp += ' AND ';
 		}
-		filterExp += 'createdAt between :from and :to';
-	}
+		filterExp += '(' + orQuery + ')';
+	} else {
+		// search userName
+		if (event.queryStringParameters && event.queryStringParameters.from && event.queryStringParameters.to) {
+			from = event.queryStringParameters.from;
+			to = event.queryStringParameters.to;
 
-	// search userId
-	if (event.queryStringParameters && event.queryStringParameters.userId) {
-		userId = event.queryStringParameters.userId;
-
-		attrValues[':userId'] = userId;
-		if (filterExp !== '') {
-			filterExp += ' AND ';
+			attrValues[':from'] = from;
+			attrValues[':to'] = to;
+			if (filterExp !== '') {
+				filterExp += ' AND ';
+			}
+			filterExp += 'createdAt between :from and :to';
 		}
-		filterExp += 'userId = :userId';
+
+		// search userId
+		if (event.queryStringParameters && event.queryStringParameters.userId) {
+			userId = event.queryStringParameters.userId;
+
+			attrValues[':userId'] = userId;
+			if (filterExp !== '') {
+				filterExp += ' AND ';
+			}
+			filterExp += 'userId = :userId';
+		}
 	}
 
 	let params = {

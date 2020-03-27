@@ -39,20 +39,6 @@ module.exports.delete = async (event) => {
 		};
 	}
 
-	const historyParams = {
-		TableName: process.env.HISTORY_TABLE,
-		Item: {
-			id: uuid.v4(),
-			action: 'delete',
-			resource: 'gallery',
-			resourceId: getRes.Item.id,
-			resourceType: null,
-			userId: getRes.Item.userId,
-			userName: getRes.Item.userName,
-			createdAt: timestamp
-		}
-	};
-
 	const params = {
 		TableName: process.env.GALLERY_TABLE,
 		Key: {
@@ -63,9 +49,6 @@ module.exports.delete = async (event) => {
 	try {
 		const res = await dynamoDb.delete(params).promise();
 		console.log(res);
-
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,

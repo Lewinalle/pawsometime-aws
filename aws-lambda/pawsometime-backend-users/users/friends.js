@@ -10,6 +10,8 @@ module.exports.request = async (event) => {
 	const data = JSON.parse(event.body);
 	let userFriendsObj;
 	let friendFriendsObj;
+	let userFound;
+	let friendFound;
 
 	let newUserFriendsObj;
 	let newFriendFriendsObj;
@@ -53,10 +55,12 @@ module.exports.request = async (event) => {
 			if (item.id === data.userId) {
 				userFriendsObj = item.friends;
 				newUserFriendsObj = item.friends;
+				userFound = item;
 			}
 			if (item.id === data.friendId) {
 				friendFriendsObj = item.friends;
 				newFriendFriendsObj = item.friends;
+				friendFound = item;
 			}
 		}
 	} catch (err) {
@@ -117,48 +121,27 @@ module.exports.request = async (event) => {
 			id: uuid.v4(),
 			action: action,
 			resource: 'user',
-			resourceId: data.friendId,
+			resourceId: userFound.id,
 			resourceType: 'friend',
-			userId: data.userId,
-			userName: data.userName,
+			userId: friendFound.id,
+			userName: friendFound.username,
 			createdAt: timestamp
 		}
 	};
 
 	let friendHistoryParams;
-	let getRes;
 
 	if (action === 'connect') {
-		const getParams = {
-			TableName: process.env.USERS_TABLE,
-			Key: {
-				id: data.friendId
-			}
-		};
-
-		try {
-			getRes = await dynamoDb.get(getParams).promise();
-
-			console.log(getRes);
-		} catch (err) {
-			console.log(err);
-
-			return {
-				statusCode: 422,
-				body: JSON.stringify(err)
-			};
-		}
-
 		friendHistoryParams = {
 			TableName: process.env.HISTORY_TABLE,
 			Item: {
 				id: uuid.v4(),
 				action: action,
 				resource: 'user',
-				resourceId: data.userId,
+				resourceId: friendFound.userId,
 				resourceType: 'friend',
-				userId: getRes.Item.id,
-				userName: getRes.Item.username,
+				userId: userFound.id,
+				userName: userFound.username,
 				createdAt: timestamp
 			}
 		};
@@ -224,6 +207,8 @@ module.exports.accept = async (event) => {
 	const data = JSON.parse(event.body);
 	let userFriendsObj;
 	let friendFriendsObj;
+	let userFound;
+	let friendFound;
 
 	let newUserFriendsObj;
 	let newFriendFriendsObj;
@@ -267,10 +252,12 @@ module.exports.accept = async (event) => {
 			if (item.id === data.userId) {
 				userFriendsObj = item.friends;
 				newUserFriendsObj = item.friends;
+				userFound = item;
 			}
 			if (item.id === data.friendId) {
 				friendFriendsObj = item.friends;
 				newFriendFriendsObj = item.friends;
+				friendFound = item;
 			}
 		}
 	} catch (err) {
@@ -317,36 +304,16 @@ module.exports.accept = async (event) => {
 		newUserFriendsObj.sent = userFriendsObj.sent.filter((item) => item !== data.friendId);
 	}
 
-	const getParams = {
-		TableName: process.env.USERS_TABLE,
-		Key: {
-			id: data.friendId
-		}
-	};
-
-	try {
-		const getRes = await dynamoDb.get(getParams).promise();
-
-		console.log(getRes);
-	} catch (err) {
-		console.log(err);
-
-		return {
-			statusCode: 422,
-			body: JSON.stringify(err)
-		};
-	}
-
 	const friendHistoryParams = {
 		TableName: process.env.HISTORY_TABLE,
 		Item: {
 			id: uuid.v4(),
 			action: 'connect',
 			resource: 'user',
-			resourceId: data.userId,
+			resourceId: userFound.id,
 			resourceType: 'friend',
-			userId: getRes.Item.id,
-			userName: getRes.Item.username,
+			userId: friendFound.id,
+			userName: friendFound.username,
 			createdAt: timestamp
 		}
 	};
@@ -357,10 +324,10 @@ module.exports.accept = async (event) => {
 			id: uuid.v4(),
 			action: 'connect',
 			resource: 'user',
-			resourceId: data.friendId,
+			resourceId: friendFound.id,
 			resourceType: 'friend',
-			userId: data.userId,
-			userName: data.userName,
+			userId: userFound.id,
+			userName: userFound.username,
 			createdAt: timestamp
 		}
 	};

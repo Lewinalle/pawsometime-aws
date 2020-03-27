@@ -47,26 +47,9 @@ const performDelete = async (dbTable, id, type) => {
 		}
 	};
 
-	const historyParams = {
-		TableName: process.env.HISTORY_TABLE,
-		Item: {
-			id: uuid.v4(),
-			action: 'delete',
-			resource: 'post',
-			resourceId: id,
-			resourceType: type,
-			userId: getRes.Item.userId,
-			userName: getRes.Item.userName,
-			createdAt: timestamp
-		}
-	};
-
 	try {
 		const res = await dynamoDb.delete(params).promise();
 		console.log('res : ' + JSON.stringify(res));
-
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,

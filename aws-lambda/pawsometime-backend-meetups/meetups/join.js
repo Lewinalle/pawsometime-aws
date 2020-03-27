@@ -86,26 +86,9 @@ module.exports.autoJoin = async (event) => {
 		ReturnValues: 'ALL_NEW'
 	};
 
-	const historyParams = {
-		TableName: process.env.HISTORY_TABLE,
-		Item: {
-			id: uuid.v4(),
-			action: 'join',
-			resource: 'meetup',
-			resourceId: event.pathParameters.id,
-			resourceType: null,
-			userId: data.userId,
-			userName: data.userName,
-			createdAt: timestamp
-		}
-	};
-
 	try {
 		const res = await dynamoDb.update(params).promise();
 		console.log(res);
-
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,
@@ -202,26 +185,9 @@ module.exports.request = async (event) => {
 		ReturnValues: 'ALL_NEW'
 	};
 
-	const historyParams = {
-		TableName: process.env.HISTORY_TABLE,
-		Item: {
-			id: uuid.v4(),
-			action: 'request',
-			resource: 'meetup',
-			resourceId: event.pathParameters.id,
-			resourceType: null,
-			userId: data.userId,
-			userName: data.userName,
-			createdAt: timestamp
-		}
-	};
-
 	try {
 		const res = await dynamoDb.update(params).promise();
 		console.log(res);
-
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,
@@ -316,26 +282,9 @@ module.exports.accept = async (event) => {
 		ReturnValues: 'ALL_NEW'
 	};
 
-	const historyParams = {
-		TableName: process.env.HISTORY_TABLE,
-		Item: {
-			id: uuid.v4(),
-			action: 'accept',
-			resource: 'meetup',
-			resourceId: event.pathParameters.id,
-			resourceType: null,
-			userId: data.userId,
-			userName: data.userName,
-			createdAt: timestamp
-		}
-	};
-
 	try {
 		const res = await dynamoDb.update(params).promise();
 		console.log(res);
-
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,
@@ -428,26 +377,9 @@ module.exports.reject = async (event) => {
 		ReturnValues: 'ALL_NEW'
 	};
 
-	const historyParams = {
-		TableName: process.env.HISTORY_TABLE,
-		Item: {
-			id: uuid.v4(),
-			action: 'reject',
-			resource: 'meetup',
-			resourceId: event.pathParameters.id,
-			resourceType: null,
-			userId: data.userId,
-			userName: data.userName,
-			createdAt: timestamp
-		}
-	};
-
 	try {
 		const res = await dynamoDb.update(params).promise();
 		console.log(res);
-
-		const historyRes = await dynamoDb.put(historyParams).promise();
-		console.log('historyRes', historyRes);
 
 		return {
 			statusCode: 200,
