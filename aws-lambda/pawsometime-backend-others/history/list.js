@@ -16,6 +16,13 @@ module.exports.list = async (event) => {
 		console.log(event.queryStringParameters.friendsActivity);
 		userIds = JSON.parse(event.queryStringParameters.friendsActivity);
 
+		if (!userIds || userIds.length === 0) {
+			return {
+				statusCode: 200,
+				body: JSON.stringify([])
+			};
+		}
+
 		let orQuery = '';
 		for (let index in userIds) {
 			let key = ':id' + index;

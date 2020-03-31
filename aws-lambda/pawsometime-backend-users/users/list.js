@@ -8,6 +8,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.list = async (event) => {
 	let username = '';
 	let description = '';
+	let email = '';
 	let userIds = [];
 
 	let attrValues = {};
