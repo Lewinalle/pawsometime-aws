@@ -127,74 +127,74 @@ functions:
             name: cognito-token-authorization
             arn: arn:aws:cognito-idp:us-west-2:095515517792:userpool/us-west-2_blgzK1ffC
 
-# resources:
-#   Resources:
-#     # posts table
-#     TipPostsDynamoDbTable:
-#       Type: 'AWS::DynamoDB::Table'
-#       DeletionPolicy: Retain
-#       Properties:
-#         AttributeDefinitions:
-#           -
-#             AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           -
-#             AttributeName: id
-#             KeyType: HASH
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 1
-#           WriteCapacityUnits: 1
-#         TableName: ${self:provider.environment.TIP_POSTS_TABLE}
+resources:
+  Resources:
+    # posts table
+    TipPostsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.TIP_POSTS_TABLE}
 
-#     QnaPostsDynamoDbTable:
-#       Type: 'AWS::DynamoDB::Table'
-#       DeletionPolicy: Retain
-#       Properties:
-#         AttributeDefinitions:
-#           -
-#             AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           -
-#             AttributeName: id
-#             KeyType: HASH
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 1
-#           WriteCapacityUnits: 1
-#         TableName: ${self:provider.environment.QNA_POSTS_TABLE}
+    QnaPostsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.QNA_POSTS_TABLE}
 
-#     TradePostsDynamoDbTable:
-#       Type: 'AWS::DynamoDB::Table'
-#       DeletionPolicy: Retain
-#       Properties:
-#         AttributeDefinitions:
-#           -
-#             AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           -
-#             AttributeName: id
-#             KeyType: HASH
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 1
-#           WriteCapacityUnits: 1
-#         TableName: ${self:provider.environment.TRADE_POSTS_TABLE}
+    TradePostsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.TRADE_POSTS_TABLE}
 
-#     GeneralPostsDynamoDbTable:
-#       Type: 'AWS::DynamoDB::Table'
-#       DeletionPolicy: Retain
-#       Properties:
-#         AttributeDefinitions:
-#           -
-#             AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           -
-#             AttributeName: id
-#             KeyType: HASH
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 1
-#           WriteCapacityUnits: 1
-#         TableName: ${self:provider.environment.GENERAL_POSTS_TABLE}
+    GeneralPostsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.GENERAL_POSTS_TABLE}
     

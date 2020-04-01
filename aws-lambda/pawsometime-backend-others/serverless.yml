@@ -128,20 +128,20 @@ functions:
           method: get
           cors: true
 
-  # cronNews:
-  #   handler: news/cronNews.cronNews
-  #   timeout: 10
-  #   # events:
-  #   #   - schedule: cron(0 11 * * ? *)
-
   cronNews:
     handler: news/cronNews.cronNews
     timeout: 10
     events:
-      - http:
-          path: news/cron
-          method: get
-          cors: true
+      - schedule: cron(0 11 * * ? *)
+
+  # cronNewsCall:
+  #   handler: news/cronNews.cronNews
+  #   timeout: 10
+  #   events:
+  #     - http:
+  #         path: news/cron
+  #         method: get
+  #         cors: true
   
   # test handler for fast-responst
   testGet:
