@@ -105,7 +105,7 @@ module.exports.update = async (event) => {
 			resourceId: event.pathParameters.id,
 			resourceType: null,
 			userId: getRes.Item.id,
-			userName: getRes.Item.userName,
+			userName: getRes.Item.username,
 			createdAt: timestamp
 		}
 	};
