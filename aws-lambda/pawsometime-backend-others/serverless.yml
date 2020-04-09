@@ -111,6 +111,15 @@ functions:
           method: get
           cors: true
 
+  # login endpoint
+  fetchLogin:
+    handler: login/fetchData.fetchData
+    events:
+      - http:
+          path: fetchLogin
+          method: get
+          cors: true
+
   # history endpoints
   listHistory:
     handler: history/list.list
@@ -171,7 +180,7 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NEWS_TABLE}
-    # news table
+    # history table
     HistoryDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
